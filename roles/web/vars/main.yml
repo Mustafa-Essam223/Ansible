@@ -1,0 +1,16 @@
+package_name: nginx
+package_version: latest
+package_service: restarted
+
+
+# variables of handlers 
+welcome_msg: hello from iti 
+username: Mustafa-Essam223
+email: mustafaessam959@gmail.com
+ 
+
+files_list:
+  - index.html 
+  - my-git-config.sh
+  - script.js 
+  - style.css

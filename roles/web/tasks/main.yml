@@ -1,0 +1,65 @@
+- name: apt update 
+  apt: 
+    update_cache: true
+- name: install nginx
+  apt: 
+    name: "{{    package_name }}"
+    state: "{{  package_version }}"
+  register: installation_of_nginx_output
+- name: copying 
+  copy: 
+    src: "{{ item }}" 
+    dest: /var/www/html/{{item}}
+  loop: "{{ files_list }}"
+  when: installation_of_nginx_output.changed == true
+  register: copying_files_output
+- name: Restart 
+  service: 
+    name: "{{    package_name }}"
+    state: "{{  package_service }}"
+  when: copying_files_output.changed == true 
+
+- name: dynamic_index_content  
+  tags: result_of_template
+  template:
+    src: ./index.html.j2
+    dest: /var/www/html/index.html
+
+- name: dynamic_Git_content
+  tags: result_of_template
+  template:
+    src: ./my-git-config.sh.j2
+    dest: /var/my-git-config.sh
+
+- name: content_of_index
+  tags: result_of_template
+  command: cat /var/www/html/index.html
+  register: IndexContent
+
+- name: result_of_dynamic_config222
+  tags: result_of_template
+  command: cat /var/my-git-config.sh
+  register: GitContent
+
+- name: content1 
+  tags: result_of_template
+  debug:
+    var: IndexContent.stdout
+
+- name:  content2
+  tags: result_of_template
+  debug: 
+    var: GitContent.stdout
+
+
+- name: install apache2 with handler  
+  tags: install_apache2_and_restart
+  apt:
+    name: apache2
+    state: present 
+    update_cache: yes 
+
+  notify:
+    - Restart Apache2 
+
+       
